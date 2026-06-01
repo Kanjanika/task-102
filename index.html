@@ -1,0 +1,995 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>งานห้อง 102</title>
+
+<!-- MSAL browser SDK -->
+<script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#fdf6e3;            /* cream */
+    --panel:#ffffff;
+    --panel-2:#fff8e7;
+    --line:#ece3cc;
+    --ink:#4a4636;
+    --muted:#9a9279;
+    --accent:#f6c453;       /* warm soft gold */
+    --accent-ink:#4a3c10;
+    --blue:#7fbce8;         /* pastel blue */
+    --blue-deep:#5a9fd4;
+    --green:#7cc4a0;
+    --red:#e88b8b;
+    --violet:#b3a0e0;
+    --slate:#bcae8e;
+    --peach:#ffe3c0;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:"IBM Plex Sans Thai",sans-serif;
+    min-height:100vh;
+  }
+  h1,h2,h3,.display{font-family:"Sora",sans-serif}
+  .wrap{max-width:1100px;margin:0 auto;padding:20px}
+
+  /* ---- login screen ---- */
+  .login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+  .login-card{
+    background:var(--panel);border:1px solid var(--line);border-radius:20px;
+    padding:40px;max-width:420px;width:100%;text-align:center;
+    box-shadow:0 20px 50px rgba(150,130,80,.18);
+  }
+  .login-card .logo{
+    width:56px;height:56px;border-radius:14px;margin:0 auto 18px;
+    background:var(--accent);color:var(--accent-ink);
+    display:flex;align-items:center;justify-content:center;font-size:28px;
+  }
+  .login-card h1{font-size:24px;margin:0 0 6px}
+  .login-card p{color:var(--muted);font-size:14px;margin:0 0 26px;line-height:1.6}
+  .btn{
+    border:none;border-radius:12px;padding:12px 18px;font-size:15px;font-weight:600;
+    cursor:pointer;font-family:inherit;transition:transform .08s,filter .15s;
+  }
+  .btn:active{transform:scale(.97)}
+  .btn-ms{background:#fff;color:#1a1a1a;display:inline-flex;align-items:center;gap:10px;width:100%;justify-content:center}
+  .btn-ms:hover{filter:brightness(.95)}
+  .ms-logo{width:18px;height:18px;display:grid;grid-template-columns:1fr 1fr;gap:2px}
+  .ms-logo span{display:block}
+  .ms-logo span:nth-child(1){background:#f25022}
+  .ms-logo span:nth-child(2){background:#7fba00}
+  .ms-logo span:nth-child(3){background:#00a4ef}
+  .ms-logo span:nth-child(4){background:#ffb900}
+
+  /* ---- top bar ---- */
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:16px 20px;background:var(--panel);border:1px solid var(--line);border-radius:16px;margin-bottom:18px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand .logo{width:38px;height:38px;border-radius:10px;background:var(--accent);color:var(--accent-ink);
+    display:flex;align-items:center;justify-content:center;font-size:20px}
+  .brand h1{font-size:18px;margin:0}
+  .brand small{color:var(--muted);font-size:12px}
+  .user{display:flex;align-items:center;gap:10px;font-size:14px}
+  .avatar{width:34px;height:34px;border-radius:50%;background:var(--blue);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:600}
+  .link{background:none;border:1px solid var(--line);color:var(--muted);border-radius:10px;
+    padding:7px 12px;font-size:13px;cursor:pointer;font-family:inherit}
+  .link:hover{color:var(--ink)}
+
+  /* ---- tabs ---- */
+  .tabs{display:flex;gap:6px;background:var(--panel);border:1px solid var(--line);
+    border-radius:14px;padding:6px;width:fit-content;margin-bottom:18px;flex-wrap:wrap}
+  .tab{background:none;border:none;color:var(--muted);padding:9px 16px;border-radius:10px;
+    cursor:pointer;font-size:14px;font-weight:500;font-family:inherit}
+  .tab.active{background:var(--accent);color:var(--accent-ink)}
+
+  /* ---- stat cards ---- */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+  .stat .n{font-size:30px;font-weight:700;font-family:"Sora"}
+  .stat .l{color:var(--muted);font-size:13px;margin-top:2px}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:16px}
+  .panel h3{margin:0 0 14px;font-size:15px}
+
+  /* ---- table ---- */
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{text-align:left;color:var(--muted);font-weight:500;font-size:12px;
+    text-transform:uppercase;letter-spacing:.04em;padding:8px 10px;border-bottom:1px solid var(--line)}
+  td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  .pill{display:inline-block;padding:3px 9px;border-radius:20px;font-size:12px;font-weight:500}
+  .pill-todo{background:#efe9d8;color:#857c61}
+  .pill-doing{background:#dcecf9;color:var(--blue-deep)}
+  .pill-hold{background:#ece3fa;color:#8268c2}
+  .pill-done{background:#d8f0e3;color:#4d9b76}
+  .pill-phase{background:#fdeec6;color:#a8841f}
+  .pill-pre{background:#fdeec6;color:#a8841f}      /* gold */
+  .pill-post{background:#d6e9f8;color:#3f7cae}     /* blue */
+  .pill-other{background:#e9e2d4;color:#8a8064}    /* neutral */
+  .due-over{color:var(--red);font-weight:600}
+  .assignees{display:flex;gap:-6px}
+  .mini-av{width:24px;height:24px;border-radius:50%;background:var(--slate);color:#fff;
+    display:inline-flex;align-items:center;justify-content:center;font-size:11px;
+    border:2px solid var(--panel);margin-left:-6px}
+  .mini-av:first-child{margin-left:0}
+
+  .bar-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+  .bar-row .name{width:120px;font-size:13px}
+  .bar-track{flex:1;background:var(--panel-2);height:10px;border-radius:6px;overflow:hidden}
+  .bar-fill{height:100%;background:var(--accent)}
+  .bar-row .val{width:90px;text-align:right;color:var(--muted);font-size:12px}
+
+  .btn-primary{background:var(--accent);color:var(--accent-ink)}
+  .btn-primary:hover{filter:brightness(.95)}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap}
+
+  /* ---- modal ---- */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;
+    justify-content:center;padding:20px;z-index:50}
+  .overlay.show{display:flex}
+  .modal{background:var(--panel);border:1px solid var(--line);border-radius:18px;
+    padding:24px;width:100%;max-width:480px;max-height:90vh;overflow:auto}
+  .modal h3{margin:0 0 16px;font-size:18px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+  .field input,.field select,.field textarea{
+    width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;
+    padding:10px 12px;color:var(--ink);font-size:14px;font-family:inherit}
+  .field select[multiple]{height:110px}
+  .modal-actions{display:flex;gap:10px;margin-top:8px}
+
+  .empty{text-align:center;color:var(--muted);padding:30px;font-size:14px}
+  .loading{text-align:center;color:var(--muted);padding:40px}
+  .banner{background:#fce8d6;border:1px solid #f3d3b3;color:#a86a3d;
+    padding:12px 16px;border-radius:12px;font-size:13px;margin-bottom:16px;line-height:1.5}
+  .hidden{display:none!important}
+
+  /* ---- filters ---- */
+  .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .filters input,.filters select{
+    background:var(--panel-2);border:1px solid var(--line);border-radius:10px;
+    padding:8px 11px;color:var(--ink);font-size:13px;font-family:inherit}
+  .filters input{flex:1;min-width:160px}
+
+  /* ---- calendar ---- */
+  .cal-grid{display:flex;flex-direction:column;gap:18px}
+  .cal-title{font-family:"Sora";font-size:16px;margin:0 0 12px;text-align:center}
+  .cal-week{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;
+    text-align:center;font-size:11px;color:var(--muted);margin-bottom:4px}
+  .cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+  .cal-cell{min-height:90px;border:1px solid var(--line);border-radius:8px;padding:5px;
+    background:var(--panel-2);overflow:hidden}
+  .cal-cell.empty{background:transparent;border:none}
+  .cal-cell.today{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+  .cal-date{font-size:12px;color:var(--muted)}
+  .cal-cell.today .cal-date{color:var(--accent);font-weight:700}
+  .cal-ev{font-size:11px;line-height:1.35;border-radius:5px;padding:2px 6px;margin-top:3px;
+    background:var(--blue);color:#fff;white-space:normal;word-break:break-word;
+    cursor:pointer;transition:filter .12s}
+  .cal-ev:hover{filter:brightness(.92)}
+  .cal-ev.over{background:var(--red)}
+
+  @media(max-width:720px){
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .cal-grid{grid-template-columns:1fr}
+    table{font-size:13px}
+    th:nth-child(2),td:nth-child(2){display:none}
+  }
+  /* ---- print ---- */
+  @media print{
+    @page{ margin:12mm; }
+    body{ background:#fff!important; }
+    .topbar .user .link, .tabs, .filters, .toolbar .btn,
+    #configBanner, .login, td:last-child, th:last-child,
+    [onclick*="calShift"]{ display:none!important; }
+    /* hide the panel that only wraps a filter bar */
+    #tasksTab > .panel:first-child,
+    #projectsTab > .panel:first-child,
+    #dashboardTab > .panel:first-child{ display:none!important; }
+    .panel, .stat, .topbar{
+      box-shadow:none!important; border:1px solid #ddd!important;
+      break-inside:avoid; page-break-inside:avoid;
+    }
+    .wrap{ max-width:100%!important; padding:0!important; }
+    .topbar{ margin-bottom:10px; }
+    .bar-fill,.pill,.cal-cell,.cal-ev{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .pill{ border:1px solid #ccc; }
+    .stats{ break-inside:avoid; }
+    #printHeading{ display:block!important; }
+  }
+  #printHeading{ display:none; }
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div id="loginView" class="login">
+  <div class="login-card">
+    <div class="logo">🏗️</div>
+    <h1>งานห้อง 102</h1>
+    <p>เข้าสู่ระบบด้วยบัญชี Microsoft 365 ของบริษัท<br/>เพื่อเชื่อมต่อกับ SharePoint List</p>
+    <button class="btn btn-ms" onclick="signIn()">
+      <span class="ms-logo"><span></span><span></span><span></span><span></span></span>
+      เข้าสู่ระบบด้วย Microsoft
+    </button>
+    <p id="loginError" style="color:var(--red);margin-top:16px"></p>
+  </div>
+</div>
+
+<!-- ================= APP ================= -->
+<div id="appView" class="wrap hidden">
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo">🏗️</div>
+      <div>
+        <h1>งานห้อง 102</h1>
+        <small id="connInfo">เชื่อมต่อ SharePoint</small>
+      </div>
+    </div>
+    <div class="user">
+      <div class="avatar" id="userAvatar">?</div>
+      <span id="userName"></span>
+      <button class="link" onclick="window.print()">🖨️ พิมพ์</button>
+      <button class="link" onclick="signOut()">ออกจากระบบ</button>
+    </div>
+  </div>
+
+  <div id="configBanner" class="banner hidden"></div>
+
+  <div id="printHeading" style="margin-bottom:14px">
+    <h2 style="margin:0;font-size:20px">งานห้อง 102 — <span id="printViewName">Dashboard</span></h2>
+    <div style="color:#666;font-size:13px" id="printDate"></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="dashboard" onclick="switchTab('dashboard')">Dashboard</button>
+    <button class="tab" data-tab="tasks" onclick="switchTab('tasks')">งานทั้งหมด</button>
+    <button class="tab" data-tab="projects" onclick="switchTab('projects')">ตามโครงการ</button>
+    <button class="tab" data-tab="calendar" onclick="switchTab('calendar')">ปฏิทิน</button>
+  </div>
+
+  <div id="dashboardTab">
+    <div class="panel" style="padding:14px;margin-bottom:18px">
+      <div class="filters">
+        <span style="font-size:13px;color:var(--muted)">ช่วงเวลา (อ้างอิงกำหนดส่ง):</span>
+        <select id="dashYear" onchange="renderDashboard()"><option value="">ทุกปี</option></select>
+        <select id="dashMonth" onchange="renderDashboard()">
+          <option value="">ทุกเดือน</option>
+          <option value="0">มกราคม</option><option value="1">กุมภาพันธ์</option>
+          <option value="2">มีนาคม</option><option value="3">เมษายน</option>
+          <option value="4">พฤษภาคม</option><option value="5">มิถุนายน</option>
+          <option value="6">กรกฎาคม</option><option value="7">สิงหาคม</option>
+          <option value="8">กันยายน</option><option value="9">ตุลาคม</option>
+          <option value="10">พฤศจิกายน</option><option value="11">ธันวาคม</option>
+        </select>
+        <button class="link" onclick="clearDashFilter()">ล้าง</button>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="n" id="sTotal">0</div><div class="l">งานทั้งหมด</div></div>
+      <div class="stat"><div class="n" id="sDoing" style="color:var(--blue)">0</div><div class="l">กำลังทำ</div></div>
+      <div class="stat"><div class="n" id="sHold" style="color:var(--violet)">0</div><div class="l">พักไว้</div></div>
+      <div class="stat"><div class="n" id="sOver" style="color:var(--red)">0</div><div class="l">เลยกำหนด</div></div>
+    </div>
+    <div class="panel">
+      <h3>งานที่ต้องส่งเดือนหน้า</h3>
+      <div id="nextMonth"></div>
+    </div>
+    <div class="panel">
+      <h3>ภาระงานต่อคน</h3>
+      <div id="workload"></div>
+    </div>
+    <div class="panel">
+      <h3>ระยะเวลาทำงานเฉลี่ยตามประเภทงาน (วัน)</h3>
+      <div id="durationByType"></div>
+    </div>
+  </div>
+
+  <div id="tasksTab" class="hidden">
+    <div class="panel" style="padding:14px">
+      <div class="filters">
+        <input id="filterSearch" placeholder="🔍 ค้นหาชื่องาน…" oninput="renderTaskTable()" />
+        <select id="filterProject" onchange="renderTaskTable()"><option value="">ทุกโครงการ</option></select>
+        <select id="filterPhase" onchange="renderTaskTable()">
+          <option value="">ทุกเฟส</option>
+          <option>Pre-Construction</option>
+          <option>Post-Construction</option>
+          <option>อื่นๆ</option>
+        </select>
+        <select id="filterType" onchange="renderTaskTable()"><option value="">ทุกประเภท</option></select>
+        <select id="filterStatus" onchange="renderTaskTable()">
+          <option value="">ทุกสถานะ</option>
+          <option value="todo">ยังไม่เริ่ม</option>
+          <option value="doing">กำลังทำ</option>
+          <option value="hold">พักไว้</option>
+          <option value="done">เสร็จแล้ว</option>
+        </select>
+        <select id="filterAssignee" onchange="renderTaskTable()"><option value="">ทุกคน</option></select>
+        <button class="link" onclick="clearFilters()">ล้างตัวกรอง</button>
+      </div>
+    </div>
+    <div class="toolbar">
+      <div id="taskCount" style="color:var(--muted);font-size:14px"></div>
+      <button class="btn btn-primary" onclick="openTaskModal()">+ เพิ่มงาน</button>
+    </div>
+    <div class="panel" style="padding:6px 14px">
+      <div id="loadingTasks" class="loading">กำลังโหลดข้อมูลจาก SharePoint…</div>
+      <table id="taskTable" class="hidden">
+        <thead><tr>
+          <th>งาน</th><th>โครงการ</th><th>เฟส</th><th>ประเภท</th>
+          <th>ผู้รับผิดชอบ</th><th>สถานะ</th><th>กำหนดส่ง</th><th></th>
+        </tr></thead>
+        <tbody id="taskBody"></tbody>
+      </table>
+      <div id="noTasks" class="empty hidden">ยังไม่มีงาน — กดปุ่ม “เพิ่มงาน” เพื่อเริ่ม</div>
+    </div>
+  </div>
+
+  <div id="projectsTab" class="hidden">
+    <div class="panel" style="padding:14px">
+      <div class="filters">
+        <input id="pFilterSearch" placeholder="🔍 ค้นหาชื่องาน…" oninput="renderProjects()" />
+        <select id="pFilterPhase" onchange="renderProjects()">
+          <option value="">ทุกเฟส</option>
+          <option>Pre-Construction</option>
+          <option>Post-Construction</option>
+          <option>อื่นๆ</option>
+        </select>
+        <select id="pFilterType" onchange="renderProjects()"><option value="">ทุกประเภท</option></select>
+        <select id="pFilterStatus" onchange="renderProjects()">
+          <option value="">ทุกสถานะ</option>
+          <option value="todo">ยังไม่เริ่ม</option>
+          <option value="doing">กำลังทำ</option>
+          <option value="hold">พักไว้</option>
+          <option value="done">เสร็จแล้ว</option>
+        </select>
+        <select id="pFilterAssignee" onchange="renderProjects()"><option value="">ทุกคน</option></select>
+        <button class="link" onclick="clearProjectFilters()">ล้างตัวกรอง</button>
+      </div>
+    </div>
+    <div id="projectGroups"></div>
+  </div>
+
+  <div id="calendarTab" class="hidden">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap">
+      <button class="link" onclick="calShift(-1)">‹ ก่อนหน้า</button>
+      <button class="link" onclick="calShift(1)">ถัดไป ›</button>
+      <span style="color:var(--muted);font-size:13px">
+        <span class="pill pill-doing" style="margin-right:6px">📋 กำหนดส่งงาน</span>
+        งานที่เลยกำหนดจะขึ้นกรอบแดง
+      </span>
+    </div>
+    <div class="cal-grid">
+      <div class="panel" id="calMonth0"></div>
+      <div class="panel" id="calMonth1"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= TASK MODAL ================= -->
+<div id="taskOverlay" class="overlay">
+  <div class="modal">
+    <h3 id="modalTitle">เพิ่มงาน</h3>
+    <input type="hidden" id="editId" />
+    <div class="field">
+      <label>ชื่องาน *</label>
+      <input id="fTitle" placeholder="เช่น ตรวจหน้างานเพื่อทำ Payment Certificate งวด 3" />
+    </div>
+    <div class="field">
+      <label>โครงการ</label>
+      <input id="fProject" placeholder="เช่น อาคารสำนักงาน A" />
+    </div>
+    <div class="field">
+      <label>เฟส</label>
+      <select id="fPhase">
+        <option>Pre-Construction</option>
+        <option>Post-Construction</option>
+        <option>อื่นๆ</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>ประเภทงาน</label>
+      <select id="fType">
+        <optgroup label="Pre-Construction">
+          <option>ประชุมช่วงทำ Budget</option>
+          <option>งานประมูล</option>
+        </optgroup>
+        <optgroup label="Post-Construction">
+          <option>ประชุมโครงการ</option>
+          <option>ตรวจหน้างาน / Payment Certificate</option>
+          <option>VO (Variation Order)</option>
+          <option>Final Account</option>
+        </optgroup>
+        <option>งานอื่นๆ ตามเจ้าของโครงการ</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>ผู้รับผิดชอบ (กด Ctrl/Cmd เลือกได้หลายคน)</label>
+      <select id="fAssignees" multiple></select>
+      <small style="color:var(--muted);font-size:12px">* รายชื่อจะถูกผูกกับบัญชีจริงเมื่อตั้งค่าคอลัมน์ Person ใน SharePoint</small>
+    </div>
+    <div class="field">
+      <label>สถานะ</label>
+      <select id="fStatus">
+        <option value="todo">ยังไม่เริ่ม</option>
+        <option value="doing">กำลังทำ</option>
+        <option value="hold">พักไว้</option>
+        <option value="done">เสร็จแล้ว</option>
+      </select>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="field"><label>วันรับงาน</label><input type="date" id="fReceived" /></div>
+      <div class="field"><label>วันเริ่มงาน</label><input type="date" id="fStarted" /></div>
+      <div class="field"><label>วันทำเสร็จ</label><input type="date" id="fCompleted" /></div>
+      <div class="field"><label>กำหนดส่ง</label><input type="date" id="fDue" /></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" style="flex:1" onclick="saveTask()">บันทึก</button>
+      <button class="btn link" onclick="closeTaskModal()">ยกเลิก</button>
+    </div>
+    <p id="saveError" style="color:var(--red);font-size:13px;margin:10px 0 0"></p>
+  </div>
+</div>
+
+<script>
+/* =========================================================================
+   ⚙️  CONFIG — แก้ 4 ค่านี้ให้ตรงกับ Azure App + SharePoint ของคุณ
+   ========================================================================= */
+const CONFIG = {
+  clientId:  "6f9d246c-24fb-4bfd-a59c-6dcea28459a6",
+  tenantId:  "33021451-82a3-41cd-b43e-baf144e67483",
+  siteId:    "costplan1.sharepoint.com,35c954da-661a-413f-8f9c-06cd07fef98c,21fac326-5c53-470c-b37b-e8b62487eb98",
+  listId:    "7f6cc70a-636a-4c88-a55a-5b64897f34ae",
+  // ชื่อ internal ของคอลัมน์ใน List (ปรับให้ตรงกับที่คุณตั้ง)
+  fields: {
+    title:     "Title",
+    project:   "Project",
+    phase:     "Phase",
+    type:      "TaskType",
+    status:    "Status",        // ค่าใน list: todo/doing/hold/done (หรือแมปเอง)
+    received:  "DateReceived",
+    started:   "DateStarted",
+    completed: "DateCompleted",
+    due:       "DueDate",
+    // ผู้รับผิดชอบ: ถ้าใช้ Person(multi) ชื่อ field มักลงท้ายด้วย LookupId
+    assignees: "AssigneesLookupId"
+  }
+};
+
+const STATUS_MAP = {
+  todo:  {label:"ยังไม่เริ่ม", cls:"pill-todo"},
+  doing: {label:"กำลังทำ",     cls:"pill-doing"},
+  hold:  {label:"พักไว้",      cls:"pill-hold"},
+  done:  {label:"เสร็จแล้ว",   cls:"pill-done"}
+};
+
+/* ---- MSAL setup ---- */
+const msalConfig = {
+  auth: {
+    clientId: CONFIG.clientId,
+    authority: "https://login.microsoftonline.com/" + CONFIG.tenantId,
+    redirectUri: window.location.origin + window.location.pathname
+  },
+  cache: { cacheLocation: "sessionStorage" }
+};
+const GRAPH_SCOPES = ["User.Read", "Sites.ReadWrite.All"];
+</script>
+<script>
+const pca = new window.msal.PublicClientApplication(msalConfig);
+let account = null;
+let TASKS = [];
+
+/* ---------- AUTH ---------- */
+async function init(){
+  // detect un-configured deployment
+  if (CONFIG.clientId.startsWith("YOUR_")) {
+    document.getElementById("loginError").textContent =
+      "⚠️ ยังไม่ได้ตั้งค่า CONFIG — เปิดไฟล์ index.html แล้วใส่ clientId / tenantId / siteId / listId ก่อน";
+  }
+  await pca.initialize();
+  const resp = await pca.handleRedirectPromise();
+  if (resp && resp.account) account = resp.account;
+  else {
+    const accts = pca.getAllAccounts();
+    if (accts.length) account = accts[0];
+  }
+  if (account) showApp();
+}
+
+async function signIn(){
+  if (CONFIG.clientId.startsWith("YOUR_")) {
+    document.getElementById("loginError").textContent =
+      "ยังไม่ได้ตั้งค่า CONFIG ในไฟล์ ไม่สามารถ login ได้";
+    return;
+  }
+  try{
+    await pca.loginRedirect({ scopes: GRAPH_SCOPES });
+  }catch(e){
+    document.getElementById("loginError").textContent = "เข้าสู่ระบบไม่สำเร็จ: " + e.message;
+  }
+}
+function signOut(){ pca.logoutRedirect(); }
+
+async function getToken(){
+  try{
+    const res = await pca.acquireTokenSilent({ scopes: GRAPH_SCOPES, account });
+    return res.accessToken;
+  }catch(e){
+    await pca.acquireTokenRedirect({ scopes: GRAPH_SCOPES });
+    return null;
+  }
+}
+
+/* ---------- GRAPH helpers ---------- */
+const GRAPH = "https://graph.microsoft.com/v1.0";
+
+async function graph(path, method="GET", body=null){
+  const token = await getToken();
+  const opt = { method, headers:{ Authorization:"Bearer "+token, "Content-Type":"application/json" } };
+  if (body) opt.body = JSON.stringify(body);
+  const res = await fetch(GRAPH + path, opt);
+  if (!res.ok){
+    const txt = await res.text();
+    throw new Error(res.status + " — " + txt);
+  }
+  return res.status === 204 ? null : res.json();
+}
+
+/* ---------- APP ---------- */
+async function showApp(){
+  document.getElementById("loginView").classList.add("hidden");
+  document.getElementById("appView").classList.remove("hidden");
+  const name = account.name || account.username;
+  document.getElementById("userName").textContent = name;
+  document.getElementById("userAvatar").textContent = (name||"?").trim().charAt(0).toUpperCase();
+  document.getElementById("connInfo").textContent = "Site: " + CONFIG.siteId.slice(0,18) + "…";
+
+  if (CONFIG.siteId.startsWith("YOUR_") || CONFIG.listId.startsWith("YOUR_")){
+    const b = document.getElementById("configBanner");
+    b.classList.remove("hidden");
+    b.innerHTML = "ยังไม่ได้ใส่ <b>siteId</b> หรือ <b>listId</b> ในไฟล์ — แอปจะแสดงข้อมูลตัวอย่างแทน เมื่อใส่ค่าจริงแล้วจะดึงจาก SharePoint List ของคุณ";
+    loadSampleData();
+    return;
+  }
+  await loadTasks();
+}
+
+function rowToTask(item){
+  const f = item.fields || {};
+  const M = CONFIG.fields;
+  return {
+    id: item.id,
+    title: f[M.title] || "(ไม่มีชื่อ)",
+    project: f[M.project] || "",
+    phase: f[M.phase] || "",
+    type: f[M.type] || "",
+    status: (f[M.status] || "todo").toLowerCase(),
+    received: f[M.received] ? f[M.received].slice(0,10) : "",
+    started: f[M.started] ? f[M.started].slice(0,10) : "",
+    completed: f[M.completed] ? f[M.completed].slice(0,10) : "",
+    due: f[M.due] ? f[M.due].slice(0,10) : "",
+    assignees: extractAssignees(f)
+  };
+}
+function extractAssignees(f){
+  // Person multi columns expand differently; try a couple of shapes
+  const M = CONFIG.fields;
+  if (Array.isArray(f[M.assignees])) return f[M.assignees].map(x=>x.LookupValue||x);
+  if (f["Assignees"] && Array.isArray(f["Assignees"])) return f["Assignees"].map(x=>x.LookupValue||x);
+  return [];
+}
+
+async function loadTasks(){
+  showTab("dashboard");
+  try{
+    const data = await graph(
+      `/sites/${CONFIG.siteId}/lists/${CONFIG.listId}/items?expand=fields&$top=500`
+    );
+    TASKS = (data.value||[]).map(rowToTask);
+    renderAll();
+  }catch(e){
+    const b = document.getElementById("configBanner");
+    b.classList.remove("hidden");
+    b.textContent = "ดึงข้อมูลไม่สำเร็จ: " + e.message + " — ตรวจสอบ siteId/listId และสิทธิ์ Sites.ReadWrite.All";
+    loadSampleData();
+  }
+}
+
+function loadSampleData(){
+  const today = new Date();
+  const d = (off)=>{const x=new Date(today);x.setDate(x.getDate()+off);return x.toISOString().slice(0,10)};
+  TASKS = [
+    {id:"s1",title:"ประชุมตั้งงบประมาณเบื้องต้น",project:"อาคารสำนักงาน A",phase:"Pre-Construction",type:"ประชุมช่วงทำ Budget",status:"done",received:d(-30),started:d(-28),completed:d(-25),due:d(-24),assignees:["สมชาย","นภา"]},
+    {id:"s2",title:"จัดทำเอกสารประมูล - BOQ",project:"อาคารสำนักงาน A",phase:"Pre-Construction",type:"งานประมูล",status:"doing",received:d(-10),started:d(-7),completed:"",due:d(5),assignees:["วิชัย"]},
+    {id:"s3",title:"ตรวจหน้างานงวดที่ 2",project:"คอนโด B",phase:"Post-Construction",type:"ตรวจหน้างาน / Payment Certificate",status:"hold",received:d(-12),started:d(-9),completed:"",due:d(-2),assignees:["ธนา","สมหญิง"]},
+    {id:"s4",title:"VO เปลี่ยนวัสดุผนังภายนอก",project:"คอนโด B",phase:"Post-Construction",type:"VO (Variation Order)",status:"todo",received:d(-3),started:"",completed:"",due:d(20),assignees:["นภา"]},
+    {id:"s5",title:"สรุป Final Account",project:"โรงงาน C",phase:"Post-Construction",type:"Final Account",status:"doing",received:d(-5),started:d(-4),completed:"",due:d(35),assignees:["สมชาย"]},
+  ];
+  renderAll();
+}
+
+/* ---------- RENDER ---------- */
+function todayStr(){ return new Date().toISOString().slice(0,10) }
+function isOverdue(t){ return t.due && t.status!=="done" && t.due < todayStr() }
+
+function renderAll(){
+  document.getElementById("loadingTasks").classList.add("hidden");
+  document.getElementById("printDate").textContent="พิมพ์เมื่อ "+new Date().toLocaleString("th-TH");
+  populateFilters(); populateDashYears();
+  renderTaskTable(); renderProjects(); buildAssigneeOptions();
+  renderCalendar();
+  renderDashboard();
+}
+
+/* ---------- DASHBOARD (with year/month filter) ---------- */
+function dashScope(){
+  const y=document.getElementById("dashYear").value;
+  const m=document.getElementById("dashMonth").value;
+  if(!y && m==="") return TASKS;
+  return TASKS.filter(t=>{
+    if(!t.due) return false;
+    const d=new Date(t.due);
+    if(y && d.getFullYear()!==+y) return false;
+    if(m!=="" && d.getMonth()!==+m) return false;
+    return true;
+  });
+}
+function populateDashYears(){
+  const years=[...new Set(TASKS.filter(t=>t.due).map(t=>new Date(t.due).getFullYear()))].sort();
+  const el=document.getElementById("dashYear");
+  const cur=el.value;
+  el.innerHTML='<option value="">ทุกปี</option>'+years.map(y=>`<option value="${y}">${y+543}</option>`).join("");
+  el.value=cur;
+}
+function clearDashFilter(){
+  document.getElementById("dashYear").value="";
+  document.getElementById("dashMonth").value="";
+  renderDashboard();
+}
+function renderDashboard(){
+  const scope=dashScope();
+  renderStats(scope); renderNextMonth(scope);
+  renderWorkload(scope); renderDuration(scope);
+}
+
+/* ---------- CALENDAR ---------- */
+let calOffset = 0; // months from current
+const TH_MONTHS=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+function calShift(d){ calOffset+=d; renderCalendar(); }
+function dateKey(y,m,d){ return `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`; }
+function renderMonth(elId, base){
+  const y=base.getFullYear(), m=base.getMonth();
+  const firstDay=new Date(y,m,1).getDay();
+  const daysIn=new Date(y,m+1,0).getDate();
+  let cells="";
+  for(let i=0;i<firstDay;i++) cells+=`<div class="cal-cell empty"></div>`;
+  for(let d=1;d<=daysIn;d++){
+    const key=dateKey(y,m,d);
+    const isToday=key===todayStr();
+    const evs=TASKS.filter(t=>t.due===key);
+    const evHtml=evs.map(t=>{
+      const over=isOverdue(t);
+      return `<div class="cal-ev ${over?'over':''}" onclick="editTask('${t.id}')" title="คลิกเพื่อแก้ไข — ${t.title} (${t.assignees.join(', ')})">📋 ${t.title}</div>`;
+    }).join("");
+    cells+=`<div class="cal-cell ${isToday?'today':''}"><div class="cal-date">${d}</div>${evHtml}</div>`;
+  }
+  document.getElementById(elId).innerHTML=
+    `<div class="cal-title">${TH_MONTHS[m]} ${y+543}</div>
+     <div class="cal-week">${["อา","จ","อ","พ","พฤ","ศ","ส"].map(x=>`<div>${x}</div>`).join("")}</div>
+     <div class="cal-days">${cells}</div>`;
+}
+function renderCalendar(){
+  const now=new Date();
+  const m0=new Date(now.getFullYear(),now.getMonth()+calOffset,1);
+  const m1=new Date(now.getFullYear(),now.getMonth()+calOffset+1,1);
+  renderMonth("calMonth0",m0);
+  renderMonth("calMonth1",m1);
+}
+
+function renderStats(scope){
+  scope=scope||TASKS;
+  document.getElementById("sTotal").textContent = scope.length;
+  document.getElementById("sDoing").textContent = scope.filter(t=>t.status==="doing").length;
+  document.getElementById("sHold").textContent  = scope.filter(t=>t.status==="hold").length;
+  document.getElementById("sOver").textContent  = scope.filter(isOverdue).length;
+}
+
+function avatars(list){
+  if(!list||!list.length) return '<span style="color:var(--muted)">—</span>';
+  return '<span class="assignees">'+list.map(n=>
+    `<span class="mini-av" title="${n}">${(n||"?").charAt(0)}</span>`).join("")+'</span>';
+}
+function phaseClass(phase){
+  if(phase==="Pre-Construction") return "pill-pre";
+  if(phase==="Post-Construction") return "pill-post";
+  return "pill-other";
+}
+function taskRow(t){
+  const st = STATUS_MAP[t.status]||STATUS_MAP.todo;
+  const due = t.due ? (isOverdue(t)?`<span class="due-over">${t.due}</span>`:t.due) : "—";
+  return `<tr>
+    <td><b>${t.title}</b></td>
+    <td>${t.project||"—"}</td>
+    <td>${t.phase?`<span class="pill ${phaseClass(t.phase)}">${t.phase}</span>`:"—"}</td>
+    <td>${t.type||"—"}</td>
+    <td>${avatars(t.assignees)}</td>
+    <td><span class="pill ${st.cls}">${st.label}</span></td>
+    <td>${due}</td>
+    <td><button class="link" onclick="editTask('${t.id}')">แก้ไข</button></td>
+  </tr>`;
+}
+function getFilteredTasks(){
+  const q=(document.getElementById("filterSearch").value||"").toLowerCase();
+  const fp=document.getElementById("filterProject").value;
+  const fph=document.getElementById("filterPhase").value;
+  const ft=document.getElementById("filterType").value;
+  const fs=document.getElementById("filterStatus").value;
+  const fa=document.getElementById("filterAssignee").value;
+  return TASKS.filter(t=>{
+    if(q && !t.title.toLowerCase().includes(q)) return false;
+    if(fp && t.project!==fp) return false;
+    if(fph && t.phase!==fph) return false;
+    if(ft && t.type!==ft) return false;
+    if(fs && t.status!==fs) return false;
+    if(fa && !t.assignees.includes(fa)) return false;
+    return true;
+  });
+}
+function clearFilters(){
+  ["filterSearch","filterProject","filterPhase","filterType","filterStatus","filterAssignee"]
+    .forEach(id=>document.getElementById(id).value="");
+  renderTaskTable();
+}
+function populateFilters(){
+  const projects=[...new Set(TASKS.map(t=>t.project).filter(Boolean))];
+  const types=[...new Set(TASKS.map(t=>t.type).filter(Boolean))];
+  const people=[...new Set(TASKS.flatMap(t=>t.assignees))];
+  const fill=(id,arr,keep)=>{
+    const el=document.getElementById(id);const cur=el.value;
+    const first=el.querySelector("option").outerHTML;
+    el.innerHTML=first+arr.map(v=>`<option>${v}</option>`).join("");
+    if(keep) el.value=cur;
+  };
+  fill("filterProject",projects,true);
+  fill("filterType",types,true);
+  fill("filterAssignee",people,true);
+  fill("pFilterType",types,true);
+  fill("pFilterAssignee",people,true);
+}
+function renderTaskTable(){
+  const tb=document.getElementById("taskBody");
+  const list=getFilteredTasks();
+  document.getElementById("taskCount").textContent =
+    list.length===TASKS.length ? `ทั้งหมด ${TASKS.length} งาน` : `แสดง ${list.length} จาก ${TASKS.length} งาน`;
+  if(!TASKS.length){
+    document.getElementById("taskTable").classList.add("hidden");
+    document.getElementById("noTasks").classList.remove("hidden");
+    document.getElementById("noTasks").textContent="ยังไม่มีงาน — กดปุ่ม “เพิ่มงาน” เพื่อเริ่ม";
+    return;
+  }
+  if(!list.length){
+    document.getElementById("taskTable").classList.add("hidden");
+    document.getElementById("noTasks").classList.remove("hidden");
+    document.getElementById("noTasks").textContent="ไม่พบงานที่ตรงกับตัวกรอง";
+    return;
+  }
+  document.getElementById("noTasks").classList.add("hidden");
+  document.getElementById("taskTable").classList.remove("hidden");
+  tb.innerHTML = list.map(taskRow).join("");
+}
+
+function renderNextMonth(scope){
+  const titleEl=document.querySelector("#dashboardTab .panel h3");
+  const y=document.getElementById("dashYear").value;
+  const m=document.getElementById("dashMonth").value;
+  let list, heading;
+  if(y || m!==""){
+    list=scope||TASKS;
+    heading="งานในช่วงที่เลือก";
+  }else{
+    const now=new Date();
+    const start=new Date(now.getFullYear(),now.getMonth()+1,1);
+    const end=new Date(now.getFullYear(),now.getMonth()+2,0);
+    list=TASKS.filter(t=>{if(!t.due)return false;const x=new Date(t.due);return x>=start&&x<=end});
+    heading="งานที่ต้องส่งเดือนหน้า";
+  }
+  if(titleEl) titleEl.textContent=heading;
+  const el=document.getElementById("nextMonth");
+  el.innerHTML = list.length? `<table><tbody>${list.map(t=>
+    `<tr><td><b>${t.title}</b></td><td>${t.project}</td><td>${avatars(t.assignees)}</td>
+     <td style="text-align:right;color:var(--muted)">${t.due||"—"}</td></tr>`).join("")}</tbody></table>`
+    : '<div class="empty">ไม่มีงานในช่วงนี้</div>';
+}
+
+function renderWorkload(scope){
+  scope=scope||TASKS;
+  const map={};
+  scope.forEach(t=>t.assignees.forEach(a=>{
+    map[a]=map[a]||{total:0,done:0};map[a].total++;if(t.status==="done")map[a].done++;
+  }));
+  const names=Object.keys(map);
+  const el=document.getElementById("workload");
+  if(!names.length){el.innerHTML='<div class="empty">ยังไม่มีข้อมูล</div>';return}
+  const max=Math.max(...names.map(n=>map[n].total));
+  el.innerHTML = names.map(n=>{
+    const w=Math.round(map[n].total/max*100);
+    return `<div class="bar-row"><div class="name">${n}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${w}%"></div></div>
+      <div class="val">${map[n].done}/${map[n].total} เสร็จ</div></div>`;
+  }).join("");
+}
+
+function renderDuration(scope){
+  scope=scope||TASKS;
+  // avg (completed - started) per type
+  const map={};
+  scope.forEach(t=>{
+    if(t.started&&t.completed){
+      const days=Math.round((new Date(t.completed)-new Date(t.started))/86400000);
+      map[t.type]=map[t.type]||[];map[t.type].push(days);
+    }
+  });
+  const types=Object.keys(map);
+  const el=document.getElementById("durationByType");
+  if(!types.length){el.innerHTML='<div class="empty">ยังไม่มีงานที่มีทั้งวันเริ่มและวันเสร็จ</div>';return}
+  const avgs=types.map(ty=>({ty,avg:Math.round(map[ty].reduce((a,b)=>a+b,0)/map[ty].length)}));
+  const max=Math.max(...avgs.map(a=>a.avg))||1;
+  el.innerHTML=avgs.map(a=>{
+    const w=Math.round(a.avg/max*100);
+    return `<div class="bar-row"><div class="name" style="width:200px">${a.ty}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${w}%;background:var(--blue)"></div></div>
+      <div class="val">${a.avg} วัน</div></div>`;
+  }).join("");
+}
+
+function getProjectFiltered(){
+  const q=(document.getElementById("pFilterSearch").value||"").toLowerCase();
+  const fph=document.getElementById("pFilterPhase").value;
+  const ft=document.getElementById("pFilterType").value;
+  const fs=document.getElementById("pFilterStatus").value;
+  const fa=document.getElementById("pFilterAssignee").value;
+  return TASKS.filter(t=>{
+    if(q && !t.title.toLowerCase().includes(q)) return false;
+    if(fph && t.phase!==fph) return false;
+    if(ft && t.type!==ft) return false;
+    if(fs && t.status!==fs) return false;
+    if(fa && !t.assignees.includes(fa)) return false;
+    return true;
+  });
+}
+function clearProjectFilters(){
+  ["pFilterSearch","pFilterPhase","pFilterType","pFilterStatus","pFilterAssignee"]
+    .forEach(id=>document.getElementById(id).value="");
+  renderProjects();
+}
+function renderProjects(){
+  const list=getProjectFiltered();
+  const el=document.getElementById("projectGroups");
+  if(!list.length){
+    el.innerHTML='<div class="panel"><div class="empty">ไม่พบงานที่ตรงกับตัวกรอง</div></div>';
+    return;
+  }
+  const groups={};
+  list.forEach(t=>{const p=t.project||"(ไม่ระบุโครงการ)";groups[p]=groups[p]||[];groups[p].push(t)});
+  el.innerHTML=Object.keys(groups).map(p=>{
+    const rows=groups[p].map(taskRow).join("");
+    return `<div class="panel"><h3>📁 ${p} <span style="color:var(--muted);font-weight:400">(${groups[p].length} งาน)</span></h3>
+      <table><thead><tr><th>งาน</th><th>โครงการ</th><th>เฟส</th><th>ประเภท</th><th>ผู้รับผิดชอบ</th><th>สถานะ</th><th>กำหนดส่ง</th><th></th></tr></thead>
+      <tbody>${rows}</tbody></table></div>`;
+  }).join("");
+}
+
+function buildAssigneeOptions(){
+  const set=new Set();
+  TASKS.forEach(t=>t.assignees.forEach(a=>set.add(a)));
+  const sel=document.getElementById("fAssignees");
+  sel.innerHTML=[...set].map(n=>`<option value="${n}">${n}</option>`).join("");
+}
+
+/* ---------- TABS ---------- */
+function switchTab(name){
+  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===name));
+  showTab(name);
+  const names={dashboard:"Dashboard",tasks:"งานทั้งหมด",projects:"ตามโครงการ",calendar:"ปฏิทิน"};
+  document.getElementById("printViewName").textContent=names[name]||name;
+  document.getElementById("printDate").textContent="พิมพ์เมื่อ "+new Date().toLocaleString("th-TH");
+}
+function showTab(name){
+  ["dashboard","tasks","projects","calendar"].forEach(t=>
+    document.getElementById(t+"Tab").classList.toggle("hidden",t!==name));
+}
+
+/* ---------- MODAL + WRITE-BACK ---------- */
+function openTaskModal(){
+  document.getElementById("modalTitle").textContent="เพิ่มงาน";
+  document.getElementById("editId").value="";
+  ["fTitle","fProject","fReceived","fStarted","fCompleted","fDue"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("fStatus").value="todo";
+  document.getElementById("saveError").textContent="";
+  document.getElementById("taskOverlay").classList.add("show");
+}
+function editTask(id){
+  const t=TASKS.find(x=>x.id===id);if(!t)return;
+  document.getElementById("modalTitle").textContent="แก้ไขงาน";
+  document.getElementById("editId").value=id;
+  document.getElementById("fTitle").value=t.title;
+  document.getElementById("fProject").value=t.project;
+  document.getElementById("fPhase").value=t.phase||"Pre-Construction";
+  document.getElementById("fType").value=t.type||"";
+  document.getElementById("fStatus").value=t.status;
+  document.getElementById("fReceived").value=t.received;
+  document.getElementById("fStarted").value=t.started;
+  document.getElementById("fCompleted").value=t.completed;
+  document.getElementById("fDue").value=t.due;
+  [...document.getElementById("fAssignees").options].forEach(o=>o.selected=t.assignees.includes(o.value));
+  document.getElementById("saveError").textContent="";
+  document.getElementById("taskOverlay").classList.add("show");
+}
+function closeTaskModal(){ document.getElementById("taskOverlay").classList.remove("show") }
+
+function readForm(){
+  return {
+    title:document.getElementById("fTitle").value.trim(),
+    project:document.getElementById("fProject").value.trim(),
+    phase:document.getElementById("fPhase").value,
+    type:document.getElementById("fType").value,
+    status:document.getElementById("fStatus").value,
+    received:document.getElementById("fReceived").value,
+    started:document.getElementById("fStarted").value,
+    completed:document.getElementById("fCompleted").value,
+    due:document.getElementById("fDue").value,
+    assignees:[...document.getElementById("fAssignees").selectedOptions].map(o=>o.value)
+  };
+}
+
+function buildFieldsPayload(f){
+  const M=CONFIG.fields, p={};
+  p[M.title]=f.title;
+  p[M.project]=f.project;
+  p[M.phase]=f.phase;
+  p[M.type]=f.type;
+  p[M.status]=f.status;
+  if(f.received) p[M.received]=f.received;
+  if(f.started)  p[M.started]=f.started;
+  if(f.completed)p[M.completed]=f.completed;
+  if(f.due)      p[M.due]=f.due;
+  // NOTE: Person multi columns require LookupId arrays — map names→IDs in production.
+  return p;
+}
+
+async function saveTask(){
+  const f=readForm();
+  if(!f.title){document.getElementById("saveError").textContent="กรุณากรอกชื่องาน";return}
+  const editId=document.getElementById("editId").value;
+
+  // sample mode (no real list configured)
+  if(CONFIG.siteId.startsWith("YOUR_")||CONFIG.listId.startsWith("YOUR_")){
+    if(editId){const t=TASKS.find(x=>x.id===editId);Object.assign(t,f);}
+    else TASKS.unshift({id:"local-"+Date.now(),...f});
+    closeTaskModal();renderAll();return;
+  }
+
+  try{
+    const payload={fields:buildFieldsPayload(f)};
+    if(editId){
+      await graph(`/sites/${CONFIG.siteId}/lists/${CONFIG.listId}/items/${editId}/fields`,"PATCH",buildFieldsPayload(f));
+    }else{
+      await graph(`/sites/${CONFIG.siteId}/lists/${CONFIG.listId}/items`,"POST",payload);
+    }
+    closeTaskModal();
+    await loadTasks();
+  }catch(e){
+    document.getElementById("saveError").textContent="บันทึกไม่สำเร็จ: "+e.message;
+  }
+}
+
+/* ---------- start ---------- */
+init();
+</script>
+</body>
+</html>
