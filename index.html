@@ -1,0 +1,934 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>งานห้อง 102</title>
+<script src="msal-browser.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fdf6e3;--panel:#fff;--panel-2:#fff8e7;--line:#ece3cc;
+  --ink:#4a4636;--muted:#9a9279;--accent:#f6c453;--accent-ink:#4a3c10;
+  --blue:#7fbce8;--blue-deep:#5a9fd4;--green:#7cc4a0;--red:#e88b8b;
+  --violet:#b3a0e0;--slate:#bcae8e;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Thai",sans-serif;min-height:100vh}
+h1,h2,h3{font-family:"Sora",sans-serif}
+.wrap{max-width:1200px;margin:0 auto;padding:16px}
+
+/* topbar */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  padding:12px 18px;background:var(--panel);border:1px solid var(--line);border-radius:14px;margin-bottom:12px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand .logo{width:34px;height:34px;border-radius:9px;background:var(--accent);color:var(--accent-ink);
+  display:flex;align-items:center;justify-content:center;font-size:17px}
+.brand h1{font-size:16px;margin:0}
+.topbar-right{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.link{background:none;border:1px solid var(--line);color:var(--muted);border-radius:9px;
+  padding:5px 11px;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.link:hover{color:var(--ink)}
+.btn{border:none;border-radius:9px;padding:6px 13px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-ms{background:#0072c6;color:#fff;display:inline-flex;align-items:center;gap:6px}
+.btn-ms:hover{background:#005ea8}
+
+/* tabs */
+.tabs{display:flex;gap:5px;background:var(--panel);border:1px solid var(--line);
+  border-radius:12px;padding:5px;width:fit-content;margin-bottom:14px;flex-wrap:wrap}
+.tab{background:none;border:none;color:var(--muted);padding:7px 13px;border-radius:9px;
+  cursor:pointer;font-size:13px;font-weight:500;font-family:inherit}
+.tab.active{background:var(--accent);color:var(--accent-ink)}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
+.stat .n{font-size:26px;font-weight:700;font-family:"Sora"}
+.stat .l{color:var(--muted);font-size:12px;margin-top:2px}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:14px;margin-bottom:12px}
+.panel h3{margin:0 0 10px;font-size:14px}
+
+/* table */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:860px}
+th{text-align:left;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;
+  letter-spacing:.04em;padding:8px 8px;border-bottom:2px solid var(--line);white-space:nowrap;background:var(--panel-2)}
+td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(246,196,83,.06)}
+.pill{display:inline-block;padding:2px 8px;border-radius:18px;font-size:11px;font-weight:500;white-space:nowrap}
+.pill-todo{background:#efe9d8;color:#857c61}.pill-doing{background:#dcecf9;color:var(--blue-deep)}
+.pill-hold{background:#ece3fa;color:#8268c2}.pill-done{background:#d8f0e3;color:#4d9b76}
+
+.due-over{color:var(--red);font-weight:600}
+.av-wrap{display:inline-flex;flex-wrap:wrap;gap:2px}
+.mini-av{width:22px;height:22px;border-radius:50%;color:#fff;display:inline-flex;
+  align-items:center;justify-content:center;font-size:10px;font-weight:600;border:2px solid var(--panel)}
+
+/* filter panel */
+.filter-panel{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:14px;margin-bottom:10px}
+.filter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;align-items:end}
+.filter-group{display:flex;flex-direction:column;gap:4px}
+.filter-group label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.filter-group select,.filter-group input[type=text],.filter-group input[type=date]{
+  background:var(--panel-2);border:1px solid var(--line);border-radius:9px;
+  padding:8px 10px;color:var(--ink);font-size:12px;font-family:inherit;width:100%}
+.filter-group select:focus,.filter-group input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(246,196,83,.25)}
+.filter-date-range{display:flex;align-items:center;gap:5px}
+.filter-date-range input{flex:1}
+.filter-date-range span{font-size:11px;color:var(--muted);white-space:nowrap}
+.filter-actions{display:flex;align-items:flex-end;gap:6px}
+.filter-divider{border:none;border-top:1px solid var(--line);margin:10px 0 8px}
+
+/* bar chart */
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.bar-row .name{width:100px;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{flex:1;background:var(--panel-2);height:9px;border-radius:5px;overflow:hidden}
+.bar-fill{height:100%}
+.bar-row .val{width:80px;text-align:right;color:var(--muted);font-size:11px}
+
+.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;flex-wrap:wrap}
+
+/* calendar */
+.cal-grid{display:flex;flex-direction:column;gap:14px}
+.cal-title{font-family:"Sora";font-size:15px;margin:0 0 10px;text-align:center;font-weight:600}
+.cal-week{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;font-size:10px;color:var(--muted);margin-bottom:3px}
+.cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-cell{min-height:78px;border:1px solid var(--line);border-radius:7px;padding:4px;background:var(--panel-2);overflow:hidden}
+.cal-cell.empty{background:transparent;border:none}
+.cal-cell.today{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.cal-date{font-size:11px;color:var(--muted);margin-bottom:2px}
+.cal-cell.today .cal-date{color:var(--accent);font-weight:700}
+.cal-ev{font-size:10px;line-height:1.25;border-radius:4px;padding:2px 5px;margin-top:1px;
+  color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;transition:filter .1s}
+.cal-ev:hover{filter:brightness(.88)}
+
+/* checklist */
+.checklist{margin-top:8px}
+.checklist-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)}
+.checklist-item:last-child{border-bottom:none}
+.checklist-item input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+.checklist-item .sub-title{flex:1;font-size:13px;cursor:pointer}
+.checklist-item .sub-title.done-text{text-decoration:line-through;color:var(--muted)}
+.checklist-item .sub-assignee{font-size:11px;color:var(--muted);white-space:nowrap}
+.checklist-item .del-sub{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0 4px;line-height:1}
+.checklist-item .del-sub:hover{color:var(--red)}
+.checklist-add{display:flex;gap:6px;margin-top:8px}
+.checklist-add input{flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:7px 10px;color:var(--ink);font-size:12px;font-family:inherit}
+.checklist-add input:focus{outline:none;border-color:var(--accent)}
+.checklist-progress{font-size:11px;color:var(--muted);margin-bottom:4px}
+.checklist-bar{height:4px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:8px}
+.checklist-bar-fill{height:100%;background:var(--green);border-radius:3px;transition:width .3s}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+.overlay.show{display:flex}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;
+  width:100%;max-width:480px;max-height:92vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.modal h3{margin:0 0 14px;font-size:17px}
+.field{margin-bottom:11px}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:500}
+.field input,.field select,.field textarea{width:100%;background:var(--panel-2);border:1px solid var(--line);
+  border-radius:9px;padding:8px 10px;color:var(--ink);font-size:13px;font-family:inherit}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(246,196,83,.2)}
+.date-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.modal-actions{display:flex;gap:7px;margin-top:8px}
+.empty{text-align:center;color:var(--muted);padding:22px;font-size:13px}
+.hidden{display:none!important}
+
+@media print{
+  @page{margin:10mm}
+  body{background:#fff!important}
+  .topbar-right,.tabs,.filter-panel,.toolbar .btn,[onclick*="calShift"]{display:none!important}
+  .panel,.stat,.topbar{box-shadow:none!important;border:1px solid #ddd!important;break-inside:avoid}
+  .wrap{max-width:100%!important;padding:0!important}
+  td:last-child,th:last-child{display:none!important}
+  .bar-fill,.pill,.cal-cell,.cal-ev{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .pill{border:1px solid #ccc}#printHeading{display:block!important}
+}
+#printHeading{display:none}
+@media(max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topbar">
+  <div class="brand">
+    <div class="logo">🏗️</div>
+    <div><h1>งานห้อง 102</h1>
+      <div style="font-size:11px">
+        <span id="sp-status-text" style="color:var(--muted)">⚪ ยังไม่ได้ Login</span>
+        <span id="sp-user-text" style="color:var(--blue-deep);margin-left:6px"></span>
+      </div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <button class="btn btn-ms" id="btn-login" onclick="ensureAuth().then(function(){loadTasks();})">🔐 Login Microsoft</button>
+    <button class="link" id="btn-logout" onclick="doLogout()" style="display:none">ออกจากระบบ</button>
+    <button class="link" id="btn-refresh" onclick="loadTasks()" style="display:none">⟳ โหลดใหม่</button>
+    <button class="link" onclick="window.print()">🖨️ พิมพ์</button>
+  </div>
+</div>
+
+<div id="printHeading" style="margin-bottom:10px">
+  <h2 style="margin:0;font-size:17px">งานห้อง 102 — <span id="printViewName">Dashboard</span></h2>
+  <div style="color:#666;font-size:12px" id="printDate"></div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" data-tab="dashboard" onclick="switchTab('dashboard')">Dashboard</button>
+  <button class="tab" data-tab="tasks" onclick="switchTab('tasks')">งานทั้งหมด</button>
+  <button class="tab" data-tab="projects" onclick="switchTab('projects')">ตามโครงการ</button>
+  <button class="tab" data-tab="calendar" onclick="switchTab('calendar')">ปฏิทิน</button>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboardTab">
+  <div class="filter-panel">
+    <div class="filter-grid" style="grid-template-columns:repeat(3,auto) 1fr">
+      <div class="filter-group">
+        <label>ปี (อ้างอิงกำหนดส่ง)</label>
+        <select id="dashYear" onchange="renderDashboard()"><option value="">ทุกปี</option></select>
+      </div>
+      <div class="filter-group">
+        <label>เดือน</label>
+        <select id="dashMonth" onchange="renderDashboard()">
+          <option value="">ทุกเดือน</option>
+          <option value="0">มกราคม</option><option value="1">กุมภาพันธ์</option><option value="2">มีนาคม</option>
+          <option value="3">เมษายน</option><option value="4">พฤษภาคม</option><option value="5">มิถุนายน</option>
+          <option value="6">กรกฎาคม</option><option value="7">สิงหาคม</option><option value="8">กันยายน</option>
+          <option value="9">ตุลาคม</option><option value="10">พฤศจิกายน</option><option value="11">ธันวาคม</option>
+        </select>
+      </div>
+      <div class="filter-actions"><button class="link" onclick="clearDashFilter()">ล้าง</button></div>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="n" id="sTotal">0</div><div class="l">งานทั้งหมด</div></div>
+    <div class="stat"><div class="n" id="sDoing" style="color:var(--blue-deep)">0</div><div class="l">กำลังทำ</div></div>
+    <div class="stat"><div class="n" id="sHold" style="color:#8268c2">0</div><div class="l">พักไว้</div></div>
+    <div class="stat"><div class="n" id="sOver" style="color:var(--red)">0</div><div class="l">เลยกำหนด</div></div>
+  </div>
+  <div class="panel"><h3 id="nextMonthTitle">งานที่ต้องส่งเดือนหน้า</h3><div id="nextMonth"></div></div>
+  <div class="panel"><h3>ภาระงานต่อคน</h3><div id="workload"></div></div>
+  <div class="panel"><h3>ระยะเวลาทำงานเฉลี่ยตามประเภทงาน (วัน)</h3><div id="durationByType"></div></div>
+</div>
+
+<!-- TASKS TAB -->
+<div id="tasksTab" class="hidden">
+  <div class="filter-panel">
+    <div class="filter-grid">
+      <div class="filter-group" style="grid-column:span 2">
+        <label>ค้นหาชื่องาน</label>
+        <input type="text" id="filterSearch" placeholder="พิมพ์ชื่องาน…" oninput="renderTaskTable()"/>
+      </div>
+      <div class="filter-group">
+        <label>โครงการ</label>
+        <select id="filterProject" onchange="renderTaskTable()"><option value="">ทั้งหมด</option></select>
+      </div>
+
+      <div class="filter-group">
+        <label>ประเภทงาน</label>
+        <select id="filterType" onchange="renderTaskTable()"><option value="">ทั้งหมด</option></select>
+      </div>
+      <div class="filter-group">
+        <label>สถานะ</label>
+        <select id="filterStatus" onchange="renderTaskTable()">
+          <option value="">ทั้งหมด</option><option value="todo">ยังไม่เริ่ม</option>
+          <option value="doing">กำลังทำ</option><option value="hold">พักไว้</option><option value="done">เสร็จแล้ว</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>ผู้รับผิดชอบ</label>
+        <select id="filterAssignee" onchange="renderTaskTable()"><option value="">ทุกคน</option></select>
+      </div>
+      <div class="filter-group">
+        <label>ปี (กำหนดส่ง)</label>
+        <select id="filterYear" onchange="renderTaskTable()"><option value="">ทุกปี</option></select>
+      </div>
+      <div class="filter-group">
+        <label>เดือน (กำหนดส่ง)</label>
+        <select id="filterMonth" onchange="renderTaskTable()">
+          <option value="">ทุกเดือน</option>
+          <option value="0">ม.ค.</option><option value="1">ก.พ.</option><option value="2">มี.ค.</option>
+          <option value="3">เม.ย.</option><option value="4">พ.ค.</option><option value="5">มิ.ย.</option>
+          <option value="6">ก.ค.</option><option value="7">ส.ค.</option><option value="8">ก.ย.</option>
+          <option value="9">ต.ค.</option><option value="10">พ.ย.</option><option value="11">ธ.ค.</option>
+        </select>
+      </div>
+    </div>
+    <hr class="filter-divider"/>
+    <div class="filter-grid">
+      <div class="filter-group">
+        <label>วันรับงาน — ตั้งแต่</label>
+        <input type="date" id="filterReceivedFrom" onchange="renderTaskTable()"/>
+      </div>
+      <div class="filter-group">
+        <label>วันรับงาน — ถึง</label>
+        <input type="date" id="filterReceivedTo" onchange="renderTaskTable()"/>
+      </div>
+      <div class="filter-group">
+        <label>กำหนดส่ง — ตั้งแต่</label>
+        <input type="date" id="filterDueFrom" onchange="renderTaskTable()"/>
+      </div>
+      <div class="filter-group">
+        <label>กำหนดส่ง — ถึง</label>
+        <input type="date" id="filterDueTo" onchange="renderTaskTable()"/>
+      </div>
+      <div class="filter-actions"><button class="link" onclick="clearFilters()">ล้างทั้งหมด</button></div>
+    </div>
+  </div>
+  <div class="toolbar">
+    <div id="taskCount" style="color:var(--muted);font-size:12px"></div>
+    <button class="btn btn-primary" onclick="openTaskModal()">+ เพิ่มงาน</button>
+  </div>
+  <div class="panel" style="padding:4px 10px">
+    <div class="table-wrap">
+      <table id="taskTable"><thead><tr>
+        <th>ชื่องาน</th><th>โครงการ</th><th>ประเภท</th>
+        <th>ผู้รับผิดชอบ</th><th>สถานะ</th>
+        <th>วันรับ</th><th>วันเริ่ม</th><th>วันเสร็จ</th><th>กำหนดส่ง</th><th></th>
+      </tr></thead><tbody id="taskBody"></tbody></table>
+    </div>
+    <div id="noTasks" class="empty hidden"></div>
+  </div>
+</div>
+
+<!-- PROJECTS TAB -->
+<div id="projectsTab" class="hidden">
+  <div class="filter-panel">
+    <div class="filter-grid">
+      <div class="filter-group" style="grid-column:span 2">
+        <label>ค้นหาชื่องาน</label>
+        <input type="text" id="pFilterSearch" placeholder="พิมพ์ชื่องาน…" oninput="renderProjects()"/>
+      </div>
+
+      <div class="filter-group">
+        <label>ประเภทงาน</label>
+        <select id="pFilterType" onchange="renderProjects()"><option value="">ทั้งหมด</option></select>
+      </div>
+      <div class="filter-group">
+        <label>สถานะ</label>
+        <select id="pFilterStatus" onchange="renderProjects()">
+          <option value="">ทั้งหมด</option><option value="todo">ยังไม่เริ่ม</option>
+          <option value="doing">กำลังทำ</option><option value="hold">พักไว้</option><option value="done">เสร็จแล้ว</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>ผู้รับผิดชอบ</label>
+        <select id="pFilterAssignee" onchange="renderProjects()"><option value="">ทุกคน</option></select>
+      </div>
+      <div class="filter-group">
+        <label>ปี (กำหนดส่ง)</label>
+        <select id="pFilterYear" onchange="renderProjects()"><option value="">ทุกปี</option></select>
+      </div>
+      <div class="filter-group">
+        <label>เดือน (กำหนดส่ง)</label>
+        <select id="pFilterMonth" onchange="renderProjects()">
+          <option value="">ทุกเดือน</option>
+          <option value="0">ม.ค.</option><option value="1">ก.พ.</option><option value="2">มี.ค.</option>
+          <option value="3">เม.ย.</option><option value="4">พ.ค.</option><option value="5">มิ.ย.</option>
+          <option value="6">ก.ค.</option><option value="7">ส.ค.</option><option value="8">ก.ย.</option>
+          <option value="9">ต.ค.</option><option value="10">พ.ย.</option><option value="11">ธ.ค.</option>
+        </select>
+      </div>
+    </div>
+    <hr class="filter-divider"/>
+    <div class="filter-grid">
+      <div class="filter-group">
+        <label>วันรับงาน — ตั้งแต่</label>
+        <input type="date" id="pFilterReceivedFrom" onchange="renderProjects()"/>
+      </div>
+      <div class="filter-group">
+        <label>วันรับงาน — ถึง</label>
+        <input type="date" id="pFilterReceivedTo" onchange="renderProjects()"/>
+      </div>
+      <div class="filter-group">
+        <label>กำหนดส่ง — ตั้งแต่</label>
+        <input type="date" id="pFilterDueFrom" onchange="renderProjects()"/>
+      </div>
+      <div class="filter-group">
+        <label>กำหนดส่ง — ถึง</label>
+        <input type="date" id="pFilterDueTo" onchange="renderProjects()"/>
+      </div>
+      <div class="filter-actions"><button class="link" onclick="clearProjectFilters()">ล้างทั้งหมด</button></div>
+    </div>
+  </div>
+  <div id="projectGroups"></div>
+</div>
+
+<!-- CALENDAR TAB -->
+<div id="calendarTab" class="hidden">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+    <button class="link" onclick="calShift(-1)">‹ ก่อนหน้า</button>
+    <button class="link" onclick="calShift(1)">ถัดไป ›</button>
+    <div id="calLegend" style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;align-items:center"></div>
+  </div>
+  <div class="cal-grid">
+    <div class="panel" id="calMonth0"></div>
+    <div class="panel" id="calMonth1"></div>
+  </div>
+</div>
+
+</div><!-- end .wrap -->
+
+<!-- MODAL -->
+<div id="taskOverlay" class="overlay">
+<div class="modal">
+  <h3 id="modalTitle">เพิ่มงาน</h3>
+  <input type="hidden" id="editId"/>
+  <div class="field"><label>ชื่องาน *</label><input id="fTitle" placeholder="ชื่องาน"/></div>
+  <div class="field"><label>โครงการ</label><input id="fProject" placeholder="ชื่อโครงการ"/></div>
+
+  <div class="field"><label>ประเภทงาน</label>
+    <select id="fType">
+      <option>ประชุม Present Budget</option><option>Tender</option><option>ประชุม Weekly Meeting</option>
+      <option>Progress Payment</option><option>Payment Certificate</option>
+      <option>VO</option><option>VE</option><option>Cost Exercise</option>
+      <option>Final Account</option><option>งานอื่นๆ</option>
+    </select>
+  </div>
+  <div class="field">
+    <label>ผู้รับผิดชอบ (กด Ctrl/Cmd เลือกหลายคน)</label>
+    <select id="fAssignees" multiple style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:9px;padding:8px 10px;color:var(--ink);font-size:13px;font-family:inherit;height:120px">
+      <option value="meen">meen</option>
+      <option value="friend">friend</option>
+      <option value="auto">auto</option>
+      <option value="nan">nan</option>
+      <option value="noon">noon</option>
+    </select>
+  </div>
+  <div class="field"><label>สถานะ</label>
+    <select id="fStatus">
+      <option value="todo">ยังไม่เริ่ม</option><option value="doing">กำลังทำ</option>
+      <option value="hold">พักไว้</option><option value="done">เสร็จแล้ว</option>
+    </select>
+  </div>
+  <div class="date-grid">
+    <div class="field"><label>วันรับงาน</label><input type="date" id="fReceived"/></div>
+    <div class="field"><label>วันเริ่มงาน</label><input type="date" id="fStarted"/></div>
+    <div class="field"><label>วันทำเสร็จ</label><input type="date" id="fCompleted"/></div>
+    <div class="field"><label>กำหนดส่ง</label><input type="date" id="fDue"/></div>
+  </div>
+  <div class="field"><label>หมายเหตุ</label>
+    <textarea id="fRemark" rows="2" style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:9px;padding:8px 10px;color:var(--ink);font-size:13px;font-family:inherit;resize:vertical"></textarea>
+  </div>
+  <div class="field">
+    <label>Checklist / Subtask</label>
+    <div class="checklist-progress" id="subProgress"></div>
+    <div class="checklist-bar"><div class="checklist-bar-fill" id="subBar" style="width:0%"></div></div>
+    <div class="checklist" id="checklistItems"></div>
+    <div class="checklist-add">
+      <input id="newSubTitle" placeholder="เพิ่ม subtask…" onkeydown="if(event.key==='Enter')addSubtaskLocal()"/>
+      <select id="newSubAssignee" style="background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:7px 8px;color:var(--ink);font-size:12px;font-family:inherit">
+        <option value="">ผู้รับผิดชอบ</option>
+        <option value="meen">meen</option>
+        <option value="friend">friend</option>
+        <option value="auto">auto</option>
+        <option value="nan">nan</option>
+        <option value="noon">noon</option>
+      </select>
+      <button class="btn btn-primary" onclick="addSubtaskLocal()" style="white-space:nowrap">+ เพิ่ม</button>
+    </div>
+  </div>
+  <div class="modal-actions">
+    <button class="btn btn-primary" style="flex:1" onclick="saveTask()">บันทึก</button>
+    <button class="btn link" onclick="closeTaskModal()">ยกเลิก</button>
+    <button class="btn link" id="delBtn" onclick="deleteTask()" style="display:none;color:var(--red)">ลบ</button>
+  </div>
+  <p id="saveError" style="color:var(--red);font-size:12px;margin:8px 0 0"></p>
+</div>
+</div>
+
+<script>
+/* CONFIG */
+var SP_CONFIG={
+  clientId:'6f9d246c-24fb-4bfd-a59c-6dcea28459a6',
+  tenantId:'33021451-82a3-41cd-b43e-baf144e67483',
+  siteId:'costplan1.sharepoint.com,35c954da-661a-413f-8f9c-06cd07fef98c,21fac326-5c53-470c-b37b-e8b62487eb98',
+  listId:'7f6cc70a-636a-4c88-a55a-5b64897f34ae',
+  subtaskListId:'176814da-1e0e-4049-bf3f-7cac92d0de75',
+};
+var SCOPES=['https://graph.microsoft.com/Sites.ReadWrite.All'];
+var SP_MAP={
+  title:'Title',project:'Project',type:'TaskType',status:'Status',
+  received:'DateReceived',started:'DateStarted',completed:'DateCompleted',due:'DueDate',
+  assignees:'Assignees',remark:'Remark'
+};
+var TEAM=[
+  {email:'siret@costplan.co.th',    nick:'meen',   color:'#e88b8b'},
+  {email:'sorawit@costplan.co.th',  nick:'friend', color:'#7fbce8'},
+  {email:'nuttawut@costplan.co.th', nick:'auto',   color:'#7cc4a0'},
+  {email:'chawannuch@costplan.co.th',nick:'nan',   color:'#f6c453'},
+  {email:'kanjanika@costplan.co.th',nick:'noon',   color:'#b3a0e0'},
+];
+function memberColor(s){s=(s||'').toLowerCase().trim();for(var i=0;i<TEAM.length;i++){if(TEAM[i].email===s||TEAM[i].nick===s)return TEAM[i].color;}return '#bcae8e';}
+function memberNick(s){s=(s||'').toLowerCase().trim();for(var i=0;i<TEAM.length;i++){if(TEAM[i].email===s||TEAM[i].nick===s)return TEAM[i].nick;}return s.split('@')[0];}
+
+/* HELPERS */
+function fmtDate(iso){if(!iso)return '—';var p=iso.split('-');if(p.length<3)return iso;return p[2]+'/'+p[1]+'/'+p[0];}
+function todayStr(){return new Date().toISOString().slice(0,10);}
+function isOverdue(t){return t.due&&t.status!=='done'&&t.due<todayStr();}
+var STATUS_MAP={
+  todo:{label:'ยังไม่เริ่ม',cls:'pill-todo'},doing:{label:'กำลังทำ',cls:'pill-doing'},
+  hold:{label:'พักไว้',cls:'pill-hold'},done:{label:'เสร็จแล้ว',cls:'pill-done'}
+};
+
+function avatars(list){
+  if(!list||!list.length)return '<span style="color:var(--muted)">—</span>';
+  return '<span class="av-wrap">'+list.map(function(e){
+    var c=memberColor(e),n=memberNick(e).charAt(0).toUpperCase();
+    return '<span class="mini-av" style="background:'+c+'" title="'+e+'">'+n+'</span>';
+  }).join('')+'</span>';
+}
+function dueBadge(t){if(!t.due)return '—';return isOverdue(t)?'<span class="due-over">'+fmtDate(t.due)+'</span>':fmtDate(t.due);}
+
+/* MSAL */
+var msalApp=null,spAccessToken=null,TASKS=[];
+function initMsal(){
+  if(typeof msal==='undefined'){setTimeout(initMsal,100);return;}
+  msalApp=new msal.PublicClientApplication({
+    auth:{clientId:SP_CONFIG.clientId,authority:'https://login.microsoftonline.com/'+SP_CONFIG.tenantId,
+      redirectUri:window.location.href.split('?')[0]},
+    cache:{cacheLocation:'localStorage'},
+  });
+  msalApp.handleRedirectPromise().then(async function(){
+    if(msalApp.getAllAccounts().length>0){await ensureAuth();loadTasks();}else renderAll();
+  }).catch(function(e){console.error(e);renderAll();});
+}
+async function waitForMsal(){while(!msalApp)await new Promise(function(r){setTimeout(r,100);});}
+async function getToken(){
+  var a=msalApp.getAllAccounts();
+  if(a.length>0){try{var r=await msalApp.acquireTokenSilent({scopes:SCOPES,account:a[0]});return r.accessToken;}catch(e){}}
+  var r2=await msalApp.acquireTokenPopup({scopes:SCOPES});return r2.accessToken;
+}
+async function ensureAuth(){
+  try{
+    await waitForMsal();spAccessToken=await getToken();
+    var a=msalApp.getAllAccounts(),user=a.length>0?(a[0].username||a[0].name||''):'';
+    document.getElementById('sp-status-text').textContent='🟢 Login แล้ว';
+    document.getElementById('sp-status-text').style.color='var(--green)';
+    document.getElementById('sp-user-text').textContent=user;
+    document.getElementById('btn-login').style.display='none';
+    document.getElementById('btn-logout').style.display='inline-block';
+    document.getElementById('btn-refresh').style.display='inline-block';
+    return true;
+  }catch(e){document.getElementById('sp-status-text').textContent='❌ '+e.message;document.getElementById('sp-status-text').style.color='var(--red)';console.error(e);return false;}
+}
+async function doLogout(){
+  try{await msalApp.logoutPopup();}catch(e){}
+  spAccessToken=null;TASKS=[];
+  document.getElementById('sp-status-text').textContent='⚪ ยังไม่ได้ Login';
+  document.getElementById('sp-status-text').style.color='var(--muted)';
+  document.getElementById('sp-user-text').textContent='';
+  document.getElementById('btn-login').style.display='inline-flex';
+  document.getElementById('btn-logout').style.display='none';
+  document.getElementById('btn-refresh').style.display='none';
+  renderAll();
+}
+
+/* GRAPH */
+async function graphFetch(path,method,body){
+  method=method||'GET';if(!spAccessToken)spAccessToken=await getToken();
+  var opts={method:method,headers:{'Authorization':'Bearer '+spAccessToken,'Content-Type':'application/json'}};
+  if(body)opts.body=JSON.stringify(body);
+  var res=await fetch('https://graph.microsoft.com/v1.0'+path,opts);
+  if(res.status===401){spAccessToken=await getToken();opts.headers['Authorization']='Bearer '+spAccessToken;res=await fetch('https://graph.microsoft.com/v1.0'+path,opts);}
+  if(!res.ok)throw new Error('Graph '+res.status+': '+await res.text());
+  return res.status===204?null:res.json();
+}
+var GL='/sites/'+SP_CONFIG.siteId+'/lists/'+SP_CONFIG.listId;
+var GSL='/sites/'+SP_CONFIG.siteId+'/lists/'+SP_CONFIG.subtaskListId;
+var SUBTASKS={}; // taskId → [{id,_spId,title,done,assignee}]
+function itemToTask(item){
+  var f=item.fields||{},M=SP_MAP;
+  return{id:item.id,_spId:item.id,
+    title:f[M.title]||'',project:f[M.project]||'',type:f[M.type]||'',
+    status:(f[M.status]||'todo').toLowerCase(),
+    received:f[M.received]?f[M.received].substring(0,10):'',
+    started:f[M.started]?f[M.started].substring(0,10):'',
+    completed:f[M.completed]?f[M.completed].substring(0,10):'',
+    due:f[M.due]?f[M.due].substring(0,10):'',
+    assignees:f[M.assignees]?String(f[M.assignees]).split(',').map(function(s){return s.trim();}).filter(Boolean):[],
+    remark:f[M.remark]||''};
+}
+async function taskToFields(t){
+  var M=SP_MAP,o={};
+  o[M.title]=t.title||'';o[M.project]=t.project||'';
+  o[M.type]=t.type||'';o[M.status]=t.status||'todo';
+  o[M.received]=t.received||null;o[M.started]=t.started||null;
+  o[M.completed]=t.completed||null;o[M.due]=t.due||null;
+  o[M.remark]=t.remark||'';o[M.assignees]=(t.assignees||[]).join(', ');
+  return o;
+}
+async function loadTasks(){
+  document.getElementById('sp-status-text').textContent='⬇ กำลังโหลด...';
+  try{
+    var data=await graphFetch(GL+'/items?expand=fields&$top=500');
+    TASKS=(data.value||[]).map(itemToTask);renderAll();
+    document.getElementById('sp-status-text').textContent='🟢 โหลดสำเร็จ '+TASKS.length+' งาน';
+    document.getElementById('sp-status-text').style.color='var(--green)';
+  }catch(e){document.getElementById('sp-status-text').textContent='❌ '+e.message;document.getElementById('sp-status-text').style.color='var(--red)';console.error(e);}
+}
+async function graphSaveTask(t){
+  var f=await taskToFields(t);
+  if(t._spId){await graphFetch(GL+'/items/'+t._spId+'/fields','PATCH',f);}
+  else{var r=await graphFetch(GL+'/items','POST',{fields:f});t._spId=r.id;t.id=r.id;}
+}
+async function graphDeleteTask(t){if(!t._spId)return;await graphFetch(GL+'/items/'+t._spId,'DELETE');}
+
+/* ---- SUBTASK functions ---- */
+async function loadSubtasks(taskId){
+  try{
+    var data=await graphFetch(GSL+'/items?expand=fields&$filter=fields/TaskID eq \''+taskId+'\'&$top=200');
+    SUBTASKS[taskId]=(data.value||[]).map(function(item){
+      var f=item.fields||{};
+      return{id:item.id,_spId:item.id,title:f.Title||'',done:!!f.Done,assignee:f.Assignee||'',taskId:taskId};
+    });
+  }catch(e){console.error('loadSubtasks error',e);SUBTASKS[taskId]=[];}
+}
+
+async function saveSubtaskToSP(sub){
+  var fields={Title:sub.title,TaskID:sub.taskId,Done:sub.done,Assignee:sub.assignee||''};
+  if(sub._spId){
+    await graphFetch(GSL+'/items/'+sub._spId+'/fields','PATCH',fields);
+  }else{
+    var res=await graphFetch(GSL+'/items','POST',{fields:fields});
+    sub._spId=res.id;sub.id=res.id;
+  }
+}
+
+async function deleteSubtaskFromSP(sub){
+  if(!sub._spId)return;
+  await graphFetch(GSL+'/items/'+sub._spId,'DELETE');
+}
+
+function renderChecklist(taskId){
+  var subs=SUBTASKS[taskId]||[];
+  var done=subs.filter(function(s){return s.done;}).length;
+  var total=subs.length;
+  var pct=total>0?Math.round(done/total*100):0;
+  document.getElementById('subProgress').textContent=total>0?(done+'/'+total+' เสร็จแล้ว ('+pct+'%)') :'ยังไม่มี subtask';
+  document.getElementById('subBar').style.width=pct+'%';
+  var el=document.getElementById('checklistItems');
+  if(!total){el.innerHTML='<div style="color:var(--muted);font-size:12px;padding:8px 0">กดปุ่ม "+ เพิ่ม" เพื่อเพิ่ม subtask</div>';return;}
+  el.innerHTML=subs.map(function(s,i){
+    var c=memberColor(s.assignee),nick=s.assignee?memberNick(s.assignee):'';
+    return '<div class="checklist-item">'
+      +'<input type="checkbox" '+(s.done?'checked':'')
+      +' onchange="toggleSubDone(\''+taskId+'\','+i+',this.checked)"/>'
+      +'<span class="sub-title'+(s.done?' done-text':'')+'" '
+      +'onclick="editSubtitleInline(\''+taskId+'\','+i+',this)">'+s.title+'</span>'
+      +(s.assignee?'<span class="sub-assignee" style="background:'+c+';color:#fff;padding:2px 7px;border-radius:10px">'+nick+'</span>':'')
+      +'<button class="del-sub" onclick="deleteSubtask(\''+taskId+'\','+i+')" title="ลบ">✕</button>'
+      +'</div>';
+  }).join('');
+}
+
+function editSubtitleInline(taskId,idx,el){
+  var sub=SUBTASKS[taskId][idx];
+  var inp=document.createElement('input');
+  inp.value=sub.title;inp.style.cssText='flex:1;background:var(--panel-2);border:1px solid var(--accent);border-radius:6px;padding:3px 7px;font-size:13px;font-family:inherit';
+  el.replaceWith(inp);inp.focus();inp.select();
+  async function save(){
+    var v=inp.value.trim();if(!v)return;
+    sub.title=v;
+    inp.replaceWith(Object.assign(document.createElement('span'),{className:'sub-title'+(sub.done?' done-text':''),textContent:v,onclick:function(){editSubtitleInline(taskId,idx,this);}}));
+    try{await saveSubtaskToSP(sub);}catch(e){console.error(e);}
+    renderChecklist(taskId);
+  }
+  inp.addEventListener('blur',save);
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter')inp.blur();if(e.key==='Escape'){inp.value=sub.title;inp.blur();}});
+}
+
+async function toggleSubDone(taskId,idx,val){
+  var sub=SUBTASKS[taskId][idx];sub.done=val;
+  renderChecklist(taskId);
+  try{await saveSubtaskToSP(sub);}catch(e){console.error(e);}
+}
+
+async function addSubtaskLocal(){
+  var titleEl=document.getElementById('newSubTitle');
+  var title=titleEl.value.trim();if(!title)return;
+  var assignee=document.getElementById('newSubAssignee').value;
+  var taskId=document.getElementById('editId').value;if(!taskId)return;
+  if(!SUBTASKS[taskId])SUBTASKS[taskId]=[];
+  var sub={id:null,_spId:null,title:title,done:false,assignee:assignee,taskId:taskId};
+  SUBTASKS[taskId].push(sub);
+  titleEl.value='';document.getElementById('newSubAssignee').value='';
+  renderChecklist(taskId);
+  try{await saveSubtaskToSP(sub);}catch(e){console.error('addSubtask error',e);}
+}
+
+async function deleteSubtask(taskId,idx){
+  var sub=SUBTASKS[taskId][idx];
+  SUBTASKS[taskId].splice(idx,1);
+  renderChecklist(taskId);
+  try{await deleteSubtaskFromSP(sub);}catch(e){console.error(e);}
+}
+
+/* POPULATE FILTERS */
+function fillSelect(id,arr,blank){
+  var el=document.getElementById(id);if(!el)return;var cur=el.value;
+  el.innerHTML='<option value="">'+blank+'</option>'+arr.map(function(v){return '<option>'+v+'</option>';}).join('');
+  if(arr.indexOf(cur)>-1)el.value=cur;
+}
+function populateFilters(){
+  var projects=[...new Set(TASKS.map(function(t){return t.project;}).filter(Boolean))];
+  var types=[...new Set(TASKS.map(function(t){return t.type;}).filter(Boolean))];
+  var people=[...new Set(TASKS.flatMap(function(t){return t.assignees;}))].sort();
+  var years=[...new Set(TASKS.filter(function(t){return t.due;}).map(function(t){return new Date(t.due).getFullYear();}))].sort();
+  fillSelect('filterProject',projects,'ทั้งหมด');
+  fillSelect('filterType',types,'ทั้งหมด');
+  fillSelect('filterAssignee',people,'ทุกคน');
+  fillSelect('pFilterType',types,'ทั้งหมด');
+  fillSelect('pFilterAssignee',people,'ทุกคน');
+  ['filterYear','pFilterYear','dashYear'].forEach(function(id){
+    var el=document.getElementById(id);if(!el)return;var cur=el.value;
+    el.innerHTML='<option value="">ทุกปี</option>'+years.map(function(y){return '<option value="'+y+'">'+y+'</option>';}).join('');
+    if(years.indexOf(+cur)>-1)el.value=cur;
+  });
+}
+
+/* RENDER ALL */
+function renderAll(){
+  document.getElementById('printDate').textContent='พิมพ์เมื่อ '+new Date().toLocaleString('th-TH');
+  populateFilters();buildCalLegend();
+  renderTaskTable();renderProjects();renderCalendar();renderDashboard();
+}
+function buildCalLegend(){
+  var el=document.getElementById('calLegend');
+  el.innerHTML='<span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:10px;border-radius:3px;background:#f59e0b;display:inline-block"></span>กำหนดส่ง</span>';
+  TEAM.forEach(function(m){el.innerHTML+='<span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:10px;border-radius:3px;background:'+m.color+';display:inline-block"></span>'+m.nick+'</span>';});
+}
+
+/* DASHBOARD */
+function dashScope(){
+  var y=document.getElementById('dashYear').value,m=document.getElementById('dashMonth').value;
+  if(!y&&m==='')return TASKS;
+  return TASKS.filter(function(t){if(!t.due)return false;var d=new Date(t.due);
+    if(y&&d.getFullYear()!==+y)return false;if(m!==''&&d.getMonth()!==+m)return false;return true;});
+}
+function clearDashFilter(){document.getElementById('dashYear').value='';document.getElementById('dashMonth').value='';renderDashboard();}
+function renderDashboard(){var s=dashScope();renderStats(s);renderNextMonth(s);renderWorkload(s);renderDuration(s);}
+function renderStats(s){s=s||TASKS;
+  document.getElementById('sTotal').textContent=s.length;
+  document.getElementById('sDoing').textContent=s.filter(function(t){return t.status==='doing';}).length;
+  document.getElementById('sHold').textContent=s.filter(function(t){return t.status==='hold';}).length;
+  document.getElementById('sOver').textContent=s.filter(isOverdue).length;}
+function renderNextMonth(scope){
+  var y=document.getElementById('dashYear').value,m=document.getElementById('dashMonth').value;
+  var list,heading;
+  if(y||m!==''){list=scope||TASKS;heading='งานในช่วงที่เลือก';}
+  else{var now=new Date(),s=new Date(now.getFullYear(),now.getMonth()+1,1),e=new Date(now.getFullYear(),now.getMonth()+2,0);
+    list=TASKS.filter(function(t){if(!t.due)return false;var x=new Date(t.due);return x>=s&&x<=e;});heading='งานที่ต้องส่งเดือนหน้า';}
+  document.getElementById('nextMonthTitle').textContent=heading;
+  var el=document.getElementById('nextMonth');
+  el.innerHTML=list.length?'<table><tbody>'+list.map(function(t){
+    return '<tr><td><b>'+t.title+'</b></td><td>'+t.project+'</td><td>'+avatars(t.assignees)+'</td><td style="text-align:right;color:var(--muted)">'+fmtDate(t.due)+'</td></tr>';
+  }).join('')+'</tbody></table>':'<div class="empty">ไม่มีงานในช่วงนี้</div>';}
+function renderWorkload(scope){scope=scope||TASKS;var map={};
+  scope.forEach(function(t){t.assignees.forEach(function(a){map[a]=map[a]||{total:0,done:0};map[a].total++;if(t.status==='done')map[a].done++;});});
+  var names=Object.keys(map),el=document.getElementById('workload');
+  if(!names.length){el.innerHTML='<div class="empty">ยังไม่มีข้อมูล</div>';return;}
+  var max=Math.max.apply(null,names.map(function(n){return map[n].total;}));
+  el.innerHTML=names.map(function(n){var w=Math.round(map[n].total/max*100),c=memberColor(n);
+    return '<div class="bar-row"><div class="name">'+memberNick(n)+'</div>'
+      +'<div class="bar-track"><div class="bar-fill" style="width:'+w+'%;background:'+c+'"></div></div>'
+      +'<div class="val">'+map[n].done+'/'+map[n].total+' เสร็จ</div></div>';}).join('');}
+function renderDuration(scope){scope=scope||TASKS;var map={};
+  scope.forEach(function(t){if(t.started&&t.completed){var d=Math.round((new Date(t.completed)-new Date(t.started))/86400000);map[t.type]=map[t.type]||[];map[t.type].push(d);}});
+  var types=Object.keys(map),el=document.getElementById('durationByType');
+  if(!types.length){el.innerHTML='<div class="empty">ยังไม่มีงานที่มีทั้งวันเริ่มและวันเสร็จ</div>';return;}
+  var avgs=types.map(function(ty){return{ty:ty,avg:Math.round(map[ty].reduce(function(a,b){return a+b;},0)/map[ty].length)};});
+  var max=Math.max.apply(null,avgs.map(function(a){return a.avg;}))||1;
+  el.innerHTML=avgs.map(function(a){var w=Math.round(a.avg/max*100);
+    return '<div class="bar-row"><div class="name" style="width:170px">'+a.ty+'</div>'
+      +'<div class="bar-track"><div class="bar-fill" style="width:'+w+'%;background:var(--blue)"></div></div>'
+      +'<div class="val">'+a.avg+' วัน</div></div>';}).join('');}
+
+/* FILTER LOGIC */
+function applyFilter(prefix){
+  var p=prefix||'';
+  var q=(document.getElementById(p+'filterSearch')||{value:''}).value.toLowerCase();
+  var fp=(document.getElementById(p+'filterProject')||{value:''}).value;
+  var ft=document.getElementById(p+'filterType').value;
+  var fs=document.getElementById(p+'filterStatus').value;
+  var fa=document.getElementById(p+'filterAssignee').value;
+  var fy=document.getElementById(p+'filterYear').value;
+  var fm=document.getElementById(p+'filterMonth').value;
+  var rfFrom=(document.getElementById(p+'filterReceivedFrom')||{value:''}).value;
+  var rfTo=(document.getElementById(p+'filterReceivedTo')||{value:''}).value;
+  var dfFrom=(document.getElementById(p+'filterDueFrom')||{value:''}).value;
+  var dfTo=(document.getElementById(p+'filterDueTo')||{value:''}).value;
+  return TASKS.filter(function(t){
+    if(q&&!t.title.toLowerCase().includes(q))return false;
+    if(fp&&t.project!==fp)return false;
+    if(ft&&t.type!==ft)return false;
+    if(fs&&t.status!==fs)return false;
+    if(fa&&t.assignees.indexOf(fa)<0)return false;
+    if(fy&&t.due&&new Date(t.due).getFullYear()!==+fy)return false;
+    if(fm!==''&&t.due&&new Date(t.due).getMonth()!==+fm)return false;
+    if(rfFrom&&t.received&&t.received<rfFrom)return false;
+    if(rfTo&&t.received&&t.received>rfTo)return false;
+    if(dfFrom&&t.due&&t.due<dfFrom)return false;
+    if(dfTo&&t.due&&t.due>dfTo)return false;
+    return true;
+  });
+}
+function clearFilters(){
+  ['filterSearch','filterProject','filterType','filterStatus','filterAssignee',
+   'filterYear','filterMonth','filterReceivedFrom','filterReceivedTo','filterDueFrom','filterDueTo']
+  .forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  renderTaskTable();
+}
+function clearProjectFilters(){
+  ['pFilterSearch','pFilterType','pFilterStatus','pFilterAssignee',
+   'pFilterYear','pFilterMonth','pFilterReceivedFrom','pFilterReceivedTo','pFilterDueFrom','pFilterDueTo']
+  .forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  renderProjects();
+}
+
+/* TASK ROW */
+function taskRow(t){var st=STATUS_MAP[t.status]||STATUS_MAP.todo;
+  var subs=SUBTASKS[t.id]||[];
+  var subBadge='';
+  if(subs.length>0){
+    var sdone=subs.filter(function(s){return s.done;}).length;
+    var spct=Math.round(sdone/subs.length*100);
+    var bcolor=spct===100?'var(--green)':spct>0?'var(--accent)':'var(--line)';
+    var btxt=spct===100?'#fff':spct>0?'var(--accent-ink)':'var(--muted)';
+    subBadge='<span style="font-size:10px;background:'+bcolor+';color:'+btxt+';border-radius:8px;padding:1px 6px;margin-left:4px">✓ '+sdone+'/'+subs.length+'</span>';
+  }
+  return '<tr>'
+    +'<td><b>'+t.title+'</b>'+subBadge+(t.remark?'<br><span style="font-size:10px;color:var(--muted)">'+t.remark+'</span>':'')+'</td>'
+    +'<td>'+(t.project||'—')+'</td>'
+    +'<td style="white-space:nowrap">'+(t.type||'—')+'</td>'
+    +'<td>'+avatars(t.assignees)+'</td>'
+    +'<td><span class="pill '+st.cls+'">'+st.label+'</span></td>'
+    +'<td style="color:var(--muted);white-space:nowrap">'+fmtDate(t.received)+'</td>'
+    +'<td style="color:var(--muted);white-space:nowrap">'+fmtDate(t.started)+'</td>'
+    +'<td style="color:var(--muted);white-space:nowrap">'+fmtDate(t.completed)+'</td>'
+    +'<td style="white-space:nowrap">'+dueBadge(t)+'</td>'
+    +'<td><button class="link" onclick="editTask(\''+t.id+'\')">แก้ไข</button></td></tr>';}
+var THEAD='<thead><tr><th>ชื่องาน</th><th>โครงการ</th><th>ประเภท</th><th>ผู้รับผิดชอบ</th><th>สถานะ</th><th>วันรับ</th><th>วันเริ่ม</th><th>วันเสร็จ</th><th>กำหนดส่ง</th><th></th></tr></thead>';
+
+function renderTaskTable(){
+  var list=applyFilter(''),tb=document.getElementById('taskBody');
+  document.getElementById('taskCount').textContent=list.length===TASKS.length?'ทั้งหมด '+TASKS.length+' งาน':'แสดง '+list.length+' จาก '+TASKS.length+' งาน';
+  if(!TASKS.length){document.getElementById('taskTable').classList.add('hidden');var n=document.getElementById('noTasks');n.classList.remove('hidden');n.textContent='Login แล้วกด โหลดใหม่ หรือกด "+ เพิ่มงาน"';return;}
+  if(!list.length){document.getElementById('taskTable').classList.add('hidden');var n2=document.getElementById('noTasks');n2.classList.remove('hidden');n2.textContent='ไม่พบงานที่ตรงกับตัวกรอง';return;}
+  document.getElementById('noTasks').classList.add('hidden');document.getElementById('taskTable').classList.remove('hidden');
+  tb.innerHTML=list.map(taskRow).join('');}
+
+function renderProjects(){
+  var list=applyFilter('p'),el=document.getElementById('projectGroups');
+  if(!list.length){el.innerHTML='<div class="panel"><div class="empty">ไม่พบงาน</div></div>';return;}
+  var groups={};list.forEach(function(t){var p=t.project||'(ไม่ระบุโครงการ)';groups[p]=groups[p]||[];groups[p].push(t);});
+  el.innerHTML=Object.keys(groups).map(function(p){var rows=groups[p].map(taskRow).join('');
+    return '<div class="panel"><h3>📁 '+p+' <span style="color:var(--muted);font-weight:400;font-size:12px">('+groups[p].length+' งาน)</span></h3>'
+      +'<div class="table-wrap"><table>'+THEAD+'<tbody>'+rows+'</tbody></table></div></div>';}).join('');}
+
+/* CALENDAR */
+var calOffset=0;
+var TH_MONTHS=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+function calShift(d){calOffset+=d;renderCalendar();}
+function dateKey(y,m,d){return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');}
+function renderMonth(elId,base){
+  var y=base.getFullYear(),m=base.getMonth(),firstDay=new Date(y,m,1).getDay(),daysIn=new Date(y,m+1,0).getDate(),cells='';
+  for(var i=0;i<firstDay;i++)cells+='<div class="cal-cell empty"></div>';
+  for(var d=1;d<=daysIn;d++){
+    var key=dateKey(y,m,d),isToday=key===todayStr(),evHtml='';
+    TASKS.filter(function(t){return t.due===key;}).forEach(function(t){
+      var ov=isOverdue(t);
+      evHtml+='<div class="cal-ev" style="background:'+(ov?'var(--red)':'#f59e0b')+'" onclick="editTask(\''+t.id+'\')" title="📋 กำหนดส่ง: '+t.title+'">📋 '+t.title+'</div>';
+    });
+    TASKS.forEach(function(t){
+      if(!t.started||!t.completed||key<t.started||key>t.completed)return;
+      var c=t.assignees.length>0?memberColor(t.assignees[0]):'#bcae8e';
+      var lbl=key===t.started?'▶':key===t.completed?'■':'─';
+      evHtml+='<div class="cal-ev" style="background:'+c+';opacity:.88" onclick="editTask(\''+t.id+'\')" title="'+t.title+' ('+fmtDate(t.started)+' → '+fmtDate(t.completed)+')">'+lbl+' '+t.title+'</div>';
+    });
+    cells+='<div class="cal-cell '+(isToday?'today':'')+'"><div class="cal-date">'+d+'</div>'+evHtml+'</div>';}
+  document.getElementById(elId).innerHTML='<div class="cal-title">'+TH_MONTHS[m]+' '+y+'</div>'
+    +'<div class="cal-week">'+['อา','จ','อ','พ','พฤ','ศ','ส'].map(function(x){return '<div>'+x+'</div>';}).join('')+'</div>'
+    +'<div class="cal-days">'+cells+'</div>';}
+function renderCalendar(){var now=new Date();
+  renderMonth('calMonth0',new Date(now.getFullYear(),now.getMonth()+calOffset,1));
+  renderMonth('calMonth1',new Date(now.getFullYear(),now.getMonth()+calOffset+1,1));}
+
+/* TABS */
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(function(b){b.classList.toggle('active',b.dataset.tab===name);});
+  ['dashboard','tasks','projects','calendar'].forEach(function(t){document.getElementById(t+'Tab').classList.toggle('hidden',t!==name);});
+  var names={dashboard:'Dashboard',tasks:'งานทั้งหมด',projects:'ตามโครงการ',calendar:'ปฏิทิน'};
+  document.getElementById('printViewName').textContent=names[name]||name;
+  document.getElementById('printDate').textContent='พิมพ์เมื่อ '+new Date().toLocaleString('th-TH');}
+
+/* MODAL */
+function openTaskModal(){
+  document.getElementById('modalTitle').textContent='เพิ่มงาน';document.getElementById('editId').value='';
+  ['fTitle','fProject','fReceived','fStarted','fCompleted','fDue','fRemark'].forEach(function(id){document.getElementById(id).value='';});
+  [...document.getElementById('fAssignees').options].forEach(function(o){o.selected=false;});
+  document.getElementById('fStatus').value='todo';document.getElementById('delBtn').style.display='none';
+  document.getElementById('saveError').textContent='';
+  // reset checklist
+  document.getElementById('subProgress').textContent='';
+  document.getElementById('subBar').style.width='0%';
+  document.getElementById('checklistItems').innerHTML='<div style="color:var(--muted);font-size:12px;padding:8px 0">บันทึกงานก่อนจึงจะเพิ่ม subtask ได้</div>';
+  document.getElementById('newSubTitle').value='';
+  document.getElementById('taskOverlay').classList.add('show');}
+function editTask(id){
+  var t=TASKS.find(function(x){return String(x.id)===String(id);});if(!t)return;
+  document.getElementById('modalTitle').textContent='แก้ไขงาน';document.getElementById('editId').value=id;
+  document.getElementById('fTitle').value=t.title;document.getElementById('fProject').value=t.project;
+  document.getElementById('fType').value=t.type||'';
+  document.getElementById('fStatus').value=t.status;document.getElementById('fReceived').value=t.received;
+  document.getElementById('fStarted').value=t.started;document.getElementById('fCompleted').value=t.completed;
+  document.getElementById('fDue').value=t.due;
+  document.getElementById('fAssignees').value='';
+  var sel=document.getElementById('fAssignees');
+  [...sel.options].forEach(function(o){o.selected=(t.assignees||[]).indexOf(o.value)>-1;});
+  document.getElementById('fRemark').value=t.remark||'';
+  document.getElementById('delBtn').style.display='inline-block';
+  document.getElementById('saveError').textContent='';
+  // reset checklist area then load
+  document.getElementById('subProgress').textContent='กำลังโหลด...';
+  document.getElementById('subBar').style.width='0%';
+  document.getElementById('checklistItems').innerHTML='';
+  document.getElementById('newSubTitle').value='';
+  document.getElementById('taskOverlay').classList.add('show');
+  // load subtasks async
+  loadSubtasks(id).then(function(){renderChecklist(id);});
+}
+function closeTaskModal(){document.getElementById('taskOverlay').classList.remove('show');}
+function readForm(){return{
+  title:document.getElementById('fTitle').value.trim(),project:document.getElementById('fProject').value.trim(),
+  type:document.getElementById('fType').value,
+  status:document.getElementById('fStatus').value,received:document.getElementById('fReceived').value,
+  started:document.getElementById('fStarted').value,completed:document.getElementById('fCompleted').value,
+  due:document.getElementById('fDue').value,
+  assignees:[...document.getElementById('fAssignees').selectedOptions].map(function(o){return o.value;}),
+  remark:document.getElementById('fRemark').value.trim()};}
+async function saveTask(){
+  var f=readForm();if(!f.title){document.getElementById('saveError').textContent='กรุณากรอกชื่องาน';return;}
+  var editId=document.getElementById('editId').value;
+  try{
+    if(editId){var t=TASKS.find(function(x){return String(x.id)===String(editId);});Object.assign(t,f);await graphSaveTask(t);}
+    else{var t2=Object.assign({},f);TASKS.unshift(t2);await graphSaveTask(t2);}
+    closeTaskModal();renderAll();
+  }catch(e){document.getElementById('saveError').textContent='บันทึกไม่สำเร็จ: '+e.message;}}
+async function deleteTask(){
+  var editId=document.getElementById('editId').value;
+  var t=TASKS.find(function(x){return String(x.id)===String(editId);});if(!t)return;
+  if(!confirm('ลบงานนี้?'))return;
+  try{await graphDeleteTask(t);TASKS=TASKS.filter(function(x){return x!==t;});closeTaskModal();renderAll();}
+  catch(e){document.getElementById('saveError').textContent='ลบไม่สำเร็จ: '+e.message;}}
+
+/* START */
+renderAll();
+initMsal();
+</script>
+</body>
+</html>
